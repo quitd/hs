@@ -93,7 +93,7 @@ function compile(a) {
         objectID: id,
         rules: []
       });
-      objnames.push(name);
+      objnames.push(r[i+2]);
       json.scenes[inn[inn.length-1].index].objects.push(id);
       skip += 4;
       inn.push({
@@ -109,10 +109,7 @@ function compile(a) {
 }
 
 compile(`
-  Scene Test
-  Object monkey test 1 2
-  End
-  End
+  Scene Test Object monkey test 1 2 End End
 `)
 
 function pleaseGiveMeSomeRandom() {
