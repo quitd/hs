@@ -1,6 +1,7 @@
 var stuff = {
   rules: {},
-  objects: {}
+  objects: {},
+  blocks: {}
 }
 
 var json = {
@@ -36,7 +37,6 @@ var json = {
 
 var objnames = [];
 
-var inString = false;
 var skip = 0;
 var inn = [];
 
@@ -48,16 +48,86 @@ function object(args) {
   stuff.objects[args.name] = args;
 }
 
+function block(ar) {
+  stuff.blocks[ar.name] = ar;
+}
+
 //stuff
 rule({
   name: 'when_game_starts',
-  args: [],
-  type: 6000
+  args: 0,
+  parameters: () => {
+    return [
+      {
+        "datum": {
+          "type": 7000,
+          "block_class": "operator"
+        },
+        "key": "",
+        "value": "",
+        "defaultValue": "",
+        "type": 52
+      }
+    ]
+  }
 });
+
+rule({
+  name: 'when_object_is_tapped',
+  args: ['object'], //replace with number?
+  parameters: arg => {
+    var h;
+    json.objects.forEach(v => {
+      if(v.name === arg[0]) h = v.objectID;
+    });
+    return [
+      {
+        "datum": {
+          "block_class": "operator",
+          "type": 7001,
+          "description": "is Tapped",
+          "params": [
+            {
+              "defaultValue": "",
+              "value": "",
+              "key": "",
+              "type": 50,
+              "variable": h||null
+            }
+          ]
+        },
+        "key": "",
+        "value": "",
+        "defaultValue": "",
+        "type": 52
+      }
+    ]
+  }
+})
 
 object({
   name: 'monkey',
   type: 0
+})
+
+block({
+  name: 'move_forward',
+  args: ['number'],
+  func: (arg) => {
+    return {
+      "block_class": "method",
+      "type": 23,
+      "description": "Move Forward",
+      "parameters": [
+        {
+          "value": arg[0]||"100",
+          "defaultValue": "",
+          "key": "",
+          "type": 57
+        }
+      ]
+    }
+  }
 })
 //stuff
 
@@ -97,9 +167,58 @@ function compile(a) {
       json.scenes[inn[inn.length-1].index].objects.push(id);
       skip += 4;
       inn.push({
-        index: Object.keys(json.objects).length,
+        index: json.objects.length-1,
         type: 'object'
       });
+      break;
+      case 'Rule':
+      var id = pleaseGiveMeSomeRandom();
+      var skipp = 1;
+      var args = [];
+      var num = 2;
+      stuff.rules[r[i+1]].args.forEach(v => {
+        var thing = handleStuff(r, i+num, v)
+        args.push(thing.res);
+        num+=thing.add;
+        skipp+=thing.add;
+        inn.splice(-1);
+      })
+      var anotherRand = pleaseGiveMeSomeRandom();
+      json.rules.push({
+        objectID: json.objects[inn[inn.length-1].index].objectID,
+        id,
+        name: '',
+        ruleBlockType: 6000,
+        type: 6000,
+        parameters: stuff.rules[r[i+1]].parameters(args)||[],
+        abilityID: anotherRand
+      });
+      json.abilities.push({
+        abilityID: anotherRand,
+        blocks: [],
+        createdAt: 0
+      });
+      json.objects[inn[inn.length-1].index].rules.push(id);
+      inn.push({
+        index: json.rules.length - 1,
+        type: 'rule',
+        abilindex: json.abilities.length - 1
+      });
+      skip += skipp;
+      break;
+      case 'Block':
+      var skipp = 1;
+      var num = 2;
+      var args = [];
+      stuff.blocks[r[i+1]].args.forEach(v => {
+        var thing = handleStuff(r, i+num, v)
+        args.push(thing.res);
+        num+=thing.add;
+        skipp+=thing.add;
+        inn.splice(-1);
+      });
+      json.abilities[inn[inn.length - 1].abilindex].blocks.push(stuff.blocks[r[i+1]].func(args));
+      skip += skipp;
       break;
       case 'End':
       inn.splice(-1);
@@ -108,14 +227,42 @@ function compile(a) {
   console.log(JSON.stringify(json));
 }
 
-compile(`
-  Scene Test Object monkey test 1 2 End End
-`)
-
-function pleaseGiveMeSomeRandom() {
-  var a = '';
-  for(var e=0;e<13;e++) {
-    a+=Math.floor(Math.random() * 9);
+function handleStuff(a, b, c) {
+  inn.push({
+    type: 'thing'
+  });
+  var d = [];
+  var e = 1;
+  for(var x=0;x==x;e++) {
+    if(a[b+e] == 'End') {
+      break;
+    } else {
+      d.push(a[b+e]);
+    }
   }
-  return a;
+  console.log(d.join(' '))
+  return {
+    res: d.join(' '),
+    add: e+1
+  };
 }
+
+compile(`
+  Scene Test
+  Object monkey test 1 2
+  Rule when_object_is_tapped Object test End
+  Block move_forward Number 12 End
+  End
+  End
+  End
+  `)
+
+
+
+  function pleaseGiveMeSomeRandom() {
+    var a = '';
+    for(var e=0;e<13;e++) {
+      a+=Math.floor(Math.random() * 9);
+    }
+    return a;
+  }
