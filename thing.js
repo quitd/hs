@@ -158,6 +158,7 @@ block({
 //stuff
 
 function compile(a) {
+  json.uuid = new Date().getTime().toString(32)
   a.trim().replace(/\n/g, ' ').split(' ').forEach((v, i, r) => {
     if(skip > 0) {
       skip -= 1;
