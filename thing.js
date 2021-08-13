@@ -169,7 +169,7 @@ function compile(a) {
       inn.push({
         index: Object.keys(json.scenes).length,
         type: 'scene'
-      });""
+      });
       json.scenes.push({
         name: r[i+1],
         objects: []
