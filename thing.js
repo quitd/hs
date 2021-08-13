@@ -55,7 +55,7 @@ function block(ar) {
 //stuff
 rule({
   name: 'when_game_starts',
-  args: 0,
+  args: [],
   parameters: () => {
     return [
       {
@@ -129,6 +129,32 @@ block({
     }
   }
 })
+
+block({
+  name: 'set_position',
+  args: ['number', 'number'],
+  func: args => {
+    return {
+      "block_class": "method",
+      "description": "Set Position",
+      "type": 41,
+      "parameters": [
+        {
+          "value": args[0],
+          "defaultValue": "",
+          "key": "to x",
+          "type": 57
+        },
+        {
+          "value": args[1],
+          "defaultValue": "",
+          "key": "y",
+          "type": 57
+        }
+      ]
+    }
+  }
+})
 //stuff
 
 function compile(a) {
@@ -143,7 +169,7 @@ function compile(a) {
       inn.push({
         index: Object.keys(json.scenes).length,
         type: 'scene'
-      });
+      });""
       json.scenes.push({
         name: r[i+1],
         objects: []
@@ -248,13 +274,12 @@ function handleStuff(a, b, c) {
 }
 
 compile(`
-  Scene Test
-  Object monkey test 1 2
-  Rule when_object_is_tapped Object test End
-  Block move_forward Number 12 End
+  Scene Test Object monkey test 1 2 Rule when_object_is_tapped Object test End Block move_forward Number 12 End
   End
+  Rule when_game_starts
+  Block set_position Number 100 End Number 300 End
   End
-  End
+  End End
   `)
 
 
