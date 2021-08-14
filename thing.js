@@ -73,6 +73,34 @@ rule({
 });
 
 rule({
+  name: 'when_i_get_message',
+  args: ['string'],
+  parameters: arg => {
+    return [
+      {
+        "datum": {
+          "block_class": "operator",
+          "type": 7023,
+          "description": "",
+          "params": [
+            {
+              "defaultValue": "",
+              "value": arg[0]||null,
+              "key": "",
+              "type": 50
+            }
+          ]
+        },
+        "key": "",
+        "value": "",
+        "defaultValue": "",
+        "type": 52
+      }
+    ]
+  }
+})
+
+rule({
   name: 'when_object_is_tapped',
   args: ['object'], //replace with number?
   parameters: arg => {
@@ -108,6 +136,47 @@ rule({
 object({
   name: 'monkey',
   type: 0
+})
+
+block({
+  name: 'broadcast_message',
+  args: ['string'],
+  //TODO: variable thing later
+  func: (arg) => {
+    return {
+      "block_class": "method",
+      "type": 126,
+      "description": "",
+      "parameters": [
+        {
+          "value": arg[0]||"100",
+          "defaultValue": "",
+          "key": "named",
+          "type": 53
+        }
+      ]
+    }
+  }
+});
+
+block({
+  name: 'wait_seconds',
+  args: ['string'],
+  func: args => {
+    return {
+      "block_class": "method",
+      "type": 61,
+      "description": "Wait",
+      "parameters": [
+        {
+          "value": args[0],
+          "defaultValue": "",
+          "key": "seconds",
+          "type": 57
+        }
+      ]
+    }
+  }
 })
 
 block({
@@ -199,6 +268,7 @@ function compile(a) {
       });
       break;
       case 'Rule':
+      if((inn[inn.length-1]||{type: 'aa'}).type !== 'object') throw new Error('You must add rules in an object.');
       var id = pleaseGiveMeSomeRandom();
       var skipp = 1;
       var args = [];
@@ -254,7 +324,7 @@ function compile(a) {
   console.log(JSON.stringify(json));
 }
 
-function handleStuff(a, b, c) {
+function handleStuff(a, b) {
   inn.push({
     type: 'thing'
   });
@@ -275,12 +345,17 @@ function handleStuff(a, b, c) {
 }
 
 compile(`
-  Scene Test Object monkey test 1 2 Rule when_object_is_tapped Object test End Block move_forward Number 12 End
-  End
+  Scene scene
+  Object monkey Monkey 5 5
   Rule when_game_starts
-  Block set_position Number 100 End Number 300 End
+  Block wait_seconds Number 1 End
+  Block broadcast_message String hi End
   End
-  End End
+  Rule when_i_get_message String hi End
+  Block move_forward Number 300 End
+  End
+  End
+  End
   `)
 
 
