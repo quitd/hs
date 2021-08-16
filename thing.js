@@ -5,6 +5,7 @@ var stuff = {
 }
 
 var json = {
+  playerVersion: "1.5.0",
   baseObjectScale: 1,
   customObjects: [],
   variables: [],
@@ -135,7 +136,8 @@ rule({
 
 object({
   name: 'monkey',
-  type: 0
+  type: 0,
+  filename: 'monkey.png'
 })
 
 block({
@@ -257,7 +259,10 @@ function compile(a) {
         xPosition: +r[i+3],
         yPosition: +r[i+4],
         objectID: id,
-        rules: []
+        rules: [],
+        filename: stuff.objects[r[i+1]].filename,
+        width: 100,
+        height: 100
       });
       objnames.push(r[i+2]);
       json.scenes[inn[inn.length-1].index].objects.push(id);
