@@ -1,7 +1,8 @@
 var stuff = {
   rules: {},
   objects: {},
-  blocks: {}
+  blocks: {},
+  variables: {}
 }
 
 var json = {
@@ -88,7 +89,8 @@ rule({
               "defaultValue": "",
               "value": arg[0]||null,
               "key": "",
-              "type": 50
+              "type": 50,
+              datum: arg[0]||null //test
             }
           ]
         },
@@ -154,7 +156,8 @@ block({
           "value": arg[0]||"100",
           "defaultValue": "",
           "key": "named",
-          "type": 53
+          "type": 53,
+          datum: arg[0]||null
         }
       ]
     }
@@ -229,6 +232,7 @@ block({
 //stuff
 
 function compile(a) {
+  var chk = false;
   json.uuid = new Date().getTime().toString(32)
   a.trim().replace(/\n/g, ' ').split(' ').forEach((v, i, r) => {
     if(skip > 0) {
@@ -238,6 +242,7 @@ function compile(a) {
     switch(v) {
       case 'Scene':
       if(inn.length !== 0) throw new Error('??')
+      chk = true;
       inn.push({
         index: Object.keys(json.scenes).length,
         type: 'scene'
@@ -322,6 +327,17 @@ function compile(a) {
       json.abilities[inn[inn.length - 1].abilindex].blocks.push(stuff.blocks[r[i+1]].func(args));
       skip += skipp;
       break;
+      case 'Var':
+      if(inn.length > 0) throw new Error('You must declare variables outside anything.');
+      if(chk) throw new Error('Declare variables before doing something else.');
+      if(r[i+1] in stuff.variables) throw new Error('You cannot redeclare a variable.');
+      json.variables.push({
+        name: r[i+1],
+        type: 8003,
+        objectIdString: pleaseGiveMeSomeRandom()
+      });
+      stuff.variables[r[i+1]] = json.variables.length;
+      break;
       case 'End':
       inn.splice(-1);
     }
@@ -330,33 +346,41 @@ function compile(a) {
 }
 
 function handleStuff(a, b) {
-  inn.push({
-    type: 'thing'
-  });
-  var d = [];
-  var e = 1;
-  for(var x=0;x==x;e++) {
-    if(a[b+e] == 'End') {
-      break;
-    } else {
-      d.push(a[b+e]);
+  if(a == 'Variable') {
+    return {
+      "type": 8003,
+      "variable": json.variables[stuff.variables[a[b+1]]].objectIdString,
+      "description": "Variable"
     }
+  } else {
+    inn.push({
+      type: 'thing'
+    });
+    var d = [];
+    var e = 1;
+    for(var x=0;x==x;e++) {
+      if(a[b+e] == 'End') {
+        break;
+      } else {
+        d.push(a[b+e]);
+      }
+    }
+    return {
+      res: d.join(' '),
+      add: e+1
+    };
   }
-  console.log(d.join(' '))
-  return {
-    res: d.join(' '),
-    add: e+1
-  };
 }
 
 compile(`
+  Var testvar
   Scene scene
-  Object monkey Monkey 5 5
+  Object monkey Monkey 200 100
   Rule when_game_starts
   Block wait_seconds Number 1 End
-  Block broadcast_message String hi End
+  Block broadcast_message Variable testvar End
   End
-  Rule when_i_get_message String hi End
+  Rule when_i_get_message Number 1 End
   Block move_forward Number 300 End
   End
   End
@@ -372,3 +396,9 @@ compile(`
     }
     return a;
   }
+
+  /*
+  "type": 8003,
+  "variable": "13644FBD-76C3-460B-9FAF-F19117E9ED32-2802-000005CDDCEC6EA2",
+  "description": "Variable"
+  */
