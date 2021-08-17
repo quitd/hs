@@ -76,7 +76,7 @@ rule({
 
 rule({
   name: 'when_i_get_message',
-  args: ['string'],
+  args: ['any'],
   parameters: arg => {
     return [
       {
@@ -105,7 +105,7 @@ rule({
 
 rule({
   name: 'when_object_is_tapped',
-  args: ['object'], //replace with number?
+  args: ['object'],
   parameters: arg => {
     var h;
     json.objects.forEach(v => {
@@ -144,7 +144,7 @@ object({
 
 block({
   name: 'broadcast_message',
-  args: ['string'],
+  args: ['any'],
   //TODO: variable thing later
   func: (arg) => {
     return {
@@ -166,7 +166,7 @@ block({
 
 block({
   name: 'wait_seconds',
-  args: ['string'],
+  args: ['any'],
   func: args => {
     return {
       "block_class": "method",
@@ -186,7 +186,7 @@ block({
 
 block({
   name: 'move_forward',
-  args: ['number'],
+  args: ['any'],
   func: (arg) => {
     return {
       "block_class": "method",
@@ -206,7 +206,7 @@ block({
 
 block({
   name: 'set_position',
-  args: ['number', 'number'],
+  args: ['any', 'any'],
   func: args => {
     return {
       "block_class": "method",
@@ -224,6 +224,34 @@ block({
           "defaultValue": "",
           "key": "y",
           "type": 57
+        }
+      ]
+    }
+  }
+})
+
+block({
+  name: 'set_variable',
+  args: ['variable', 'any'],
+  func: args => {
+    return {
+      "block_class": "method",
+      "description": "Set",
+      "type": 45,
+      "parameters": [
+        {
+          "defaultValue": "",
+          "value": "",
+          "key": "",
+          "datum": args[0],
+          "type": 47
+        },
+        {
+          "defaultValue": "10",
+          "value": args[1],
+          "key": "to",
+          datum: args[1],
+          "type": 48
         }
       ]
     }
@@ -336,7 +364,7 @@ function compile(a) {
         type: 8003,
         objectIdString: pleaseGiveMeSomeRandom()
       });
-      stuff.variables[r[i+1]] = json.variables.length;
+      stuff.variables[r[i+1]] = json.variables.length - 1;
       break;
       case 'End':
       inn.splice(-1);
@@ -345,14 +373,21 @@ function compile(a) {
   console.log(JSON.stringify(json));
 }
 
-function handleStuff(a, b) {
-  if(a == 'Variable') {
+function handleStuff(a, b, c) {
+  if(a[b] == 'Variable') {
+    inn.push({
+      type: 'var'
+    });
     return {
-      "type": 8003,
-      "variable": json.variables[stuff.variables[a[b+1]]].objectIdString,
-      "description": "Variable"
+      res: {
+        "type": 8003,
+        "variable": json.variables[stuff.variables[a[b+1]]].objectIdString,
+        "description": "Variable"
+      },
+      add: 3
     }
   } else {
+    if(c == 'variable') throw new Error('??')
     inn.push({
       type: 'thing'
     });
@@ -377,10 +412,11 @@ compile(`
   Scene scene
   Object monkey Monkey 200 100
   Rule when_game_starts
+  Block set_variable Variable testvar End Number 15 End
   Block wait_seconds Number 1 End
   Block broadcast_message Variable testvar End
   End
-  Rule when_i_get_message Number 1 End
+  Rule when_i_get_message Number 15 End
   Block move_forward Number 300 End
   End
   End
@@ -396,9 +432,3 @@ compile(`
     }
     return a;
   }
-
-  /*
-  "type": 8003,
-  "variable": "13644FBD-76C3-460B-9FAF-F19117E9ED32-2802-000005CDDCEC6EA2",
-  "description": "Variable"
-  */
