@@ -3,7 +3,8 @@ var stuff = {
   objects: {},
   blocks: {},
   variables: {},
-  bl2s: {}
+  bl2s: {},
+  customabilities: {}
 }
 
 var json = {
@@ -427,6 +428,7 @@ function compile(a) {
         objectIdString: pleaseGiveMeSomeRandom()
       });
       stuff.variables[r[i+1]] = json.variables.length - 1;
+      skip += 1;
       break;
       case 'Block2':
       var skipp = 1;
@@ -451,7 +453,35 @@ function compile(a) {
         type: 'bl2',
         abilindex: json.abilities.length - 1
       });
-      skipp += skip;
+      skip += skipp;
+      break;
+      case 'Custom_Ability':
+      if(inn.length > 0) throw new Error('You must create custom abilities outside anything.');
+      if(chk) throw new Error('Create custom abilities before doing something else.');
+      if(r[i+1] in stuff.customabilities) throw new Error('You cannot re-create a custom ability.');
+      json.abilities.push({
+        blocks: [],
+        createdAt: 0,
+        abilityID: pleaseGiveMeSomeRandom()
+      });
+      stuff.customabilities[r[i+1]] = json.abilities.length - 1;
+      inn.push({
+        type: 'ca',
+        index: json.abilities.length - 1,
+        abilindex: json.abilities.length - 1
+      })
+      skip += 1;
+      break;
+      case 'Ability':
+      json.abilities[inn[inn.length - 1].abilindex].blocks.push({
+        "block_class": "control",
+        "description": r[i+1],
+        "type": 123,
+        "controlScript": {
+          "abilityID": json.abilities[stuff.customabilities[r[i+1]]].abilityID
+        }
+      });
+      skip += 1;
       break;
       case 'End':
       inn.splice(-1);
@@ -497,6 +527,9 @@ function handleStuff(a, b, c) {
 compile(`
   Var testvar
   Var test2
+  Custom_Ability ability
+  Block change_y Number 1000 End
+  End
   Scene scene
   Object monkey Monkey 200 100
   Rule when_game_starts
@@ -522,6 +555,11 @@ compile(`
   Block wait_seconds Number 1 End
   End
   End
+  End
+  Object monkey Monkey3 600 40
+  Rule when_game_starts
+  Block wait_seconds Number 3 End
+  Ability ability
   End
   End
   `)
