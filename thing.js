@@ -320,6 +320,32 @@ block({
     }
   }
 })
+
+block({
+  name: 'set_text',
+  args: ['any', 'color'],
+  func: args => {
+    return {
+      "block_class": "method",
+      "type": 40,
+      "description": "Set Text",
+      "parameters": [
+        {
+          "value": args[0],
+          "defaultValue": "",
+          "key": "to",
+          "type": 53,
+          datum: args[0]
+        },
+        {
+          "value": args[1],
+          "key": "color",
+          "type": 44
+        }
+      ]
+    }
+  }
+})
 //stuff
 
 function compile(a) {
@@ -503,8 +529,21 @@ function handleStuff(a, b, c) {
       },
       add: 3
     }
+  } else if(a[b] == 'Color') {
+    if(c !== 'color') throw new Error('??');
+    inn.push({
+      type: 'thing'
+    });
+    var hsb = [];
+    for(var x=0;x<3;x++) {
+      hsb.push(a[b+x+1]);
+    }
+    return {
+      res: `HSB(${hsb.join(',')})`,
+      add: 5
+    }
   } else {
-    if(c == 'variable') throw new Error('??')
+    if(['variable', 'color'].includes(c)) throw new Error('??')
     inn.push({
       type: 'thing'
     });
@@ -528,7 +567,10 @@ compile(`
   Var testvar
   Var test2
   Custom_Ability ability
-  Block change_y Number 1000 End
+  Block change_y Number 300 End
+  End
+  Custom_Ability changetext
+  Block set_text Variable testvar End Color 50 60 90 End
   End
   Scene scene
   Object monkey Monkey 200 100
@@ -560,6 +602,8 @@ compile(`
   Rule when_game_starts
   Block wait_seconds Number 3 End
   Ability ability
+  Block wait_seconds Number 1.5 End
+  Ability changetext
   End
   End
   `)
