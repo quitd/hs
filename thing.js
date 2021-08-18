@@ -2,7 +2,8 @@ var stuff = {
   rules: {},
   objects: {},
   blocks: {},
-  variables: {}
+  variables: {},
+  bl2s: {}
 }
 
 var json = {
@@ -54,6 +55,10 @@ function block(ar) {
   stuff.blocks[ar.name] = ar;
 }
 
+function bl2(arg) {
+  stuff.bl2s[arg.name] = arg;
+}
+
 //stuff
 rule({
   name: 'when_game_starts',
@@ -90,7 +95,7 @@ rule({
               "value": arg[0]||null,
               "key": "",
               "type": 50,
-              datum: arg[0]||null //test
+              datum: arg[0]||null
             }
           ]
         },
@@ -103,7 +108,7 @@ rule({
   }
 })
 
-rule({
+rule({ //TODO: fix this
   name: 'when_object_is_tapped',
   args: ['object'],
   parameters: arg => {
@@ -155,7 +160,7 @@ block({
         {
           "value": arg[0]||"100",
           "defaultValue": "",
-          "key": "named",
+          "key": "na //testmed",
           "type": 53,
           datum: arg[0]||null
         }
@@ -252,6 +257,63 @@ block({
           "key": "to",
           datum: args[1],
           "type": 48
+        }
+      ]
+    }
+  }
+})
+
+bl2({
+  name: 'repeat_forever',
+  args: [],
+  func: (ar, id) => {
+    return {
+      "block_class": "control",
+      "description": "Repeat Forever",
+      "controlScript": {
+        "abilityID": id
+      },
+      "type": 121
+    }
+  }
+})
+
+block({
+  name: 'change_y',
+  args: ['any'],
+  func: arg => {
+    return {
+      "block_class": "method",
+      "description": "Change Y by",
+      "type": 28,
+      "parameters": [
+        {
+          "value": arg[0]||'100',
+          "defaultValue": "",
+          "key": "",
+          "type": 57,
+          datum: arg[0]||'100'
+        }
+      ]
+    }
+  }
+});
+
+block({
+  name: 'change_x',
+  args: ['any'],
+  func: arg => {
+    return {
+      "block_class": "method",
+      "description": "Change X by",
+      "type": 27,
+      "parameters": [
+        {
+          "value": arg[0]||'100',
+          "defaultValue": "",
+          "key": "",
+          "type": 57,
+          datum: arg[0]||'100'
         }
       ]
     }
@@ -366,6 +428,31 @@ function compile(a) {
       });
       stuff.variables[r[i+1]] = json.variables.length - 1;
       break;
+      case 'Block2':
+      var skipp = 1;
+      var num = 2;
+      var args = [];
+      stuff.bl2s[r[i+1]].args.forEach(v => {
+        var thing = handleStuff(r, i+num, v)
+        args.push(thing.res);
+        num+=thing.add;
+        skipp+=thing.add;
+        inn.splice(-1);
+      });
+      var id = pleaseGiveMeSomeRandom();
+      json.abilities[inn[inn.length - 1].abilindex].blocks.push(stuff.bl2s[r[i+1]].func(args, id));
+      json.abilities.push({
+        abilityID: id,
+        blocks: [],
+        createdAt: 0
+      })
+      inn.push({
+        index: json.abilities.length - 1,
+        type: 'bl2',
+        abilindex: json.abilities.length - 1
+      });
+      skipp += skip;
+      break;
       case 'End':
       inn.splice(-1);
     }
@@ -409,6 +496,7 @@ function handleStuff(a, b, c) {
 
 compile(`
   Var testvar
+  Var test2
   Scene scene
   Object monkey Monkey 200 100
   Rule when_game_starts
@@ -418,6 +506,21 @@ compile(`
   End
   Rule when_i_get_message Number 15 End
   Block move_forward Number 300 End
+  End
+  End
+  Object monkey Monkey2 300 50
+  Rule when_game_starts
+  Block set_variable Variable test2 End Number -50 End
+  Block2 repeat_forever
+  Block change_x Number 50 End
+  Block wait_seconds Number 1 End
+  Block change_y Number 50 End
+  Block wait_seconds Number 1 End
+  Block change_x Number -50 End
+  Block wait_seconds Number 1 End
+  Block change_y Variable test2 End
+  Block wait_seconds Number 1 End
+  End
   End
   End
   End
