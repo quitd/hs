@@ -160,7 +160,7 @@ block({
         {
           "value": arg[0]||"100",
           "defaultValue": "",
-          "key": "na //testmed",
+          "key": "named",
           "type": 53,
           datum: arg[0]||null
         }
