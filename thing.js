@@ -64,7 +64,10 @@ function bl2(arg) {
 eval(Deno.readTextFileSync('hs.js'));
 
 function compile(a) {
-  var chk = false;
+  var chk = {
+    var: false,
+    abi: false
+  };
   json.uuid = new Date().getTime().toString(32)
   a.trim().replace(/\n/g, ' ').split(' ').forEach((v, i, r) => {
     if(skip > 0) {
@@ -74,7 +77,7 @@ function compile(a) {
     switch(v) {
       case 'Scene':
       if(inn.length !== 0) throw new Error('??')
-      chk = true;
+      chk.var = chk.abi = true;
       inn.push({
         index: Object.keys(json.scenes).length,
         type: 'scene'
@@ -161,7 +164,7 @@ function compile(a) {
       break;
       case 'Var':
       if(inn.length > 0) throw new Error('You must declare variables outside anything.');
-      if(chk) throw new Error('Declare variables before doing something else.');
+      if(chk.var) throw new Error('Declare variables before doing something else.');
       if(r[i+1] in stuff.variables) throw new Error('You cannot redeclare a variable.');
       json.variables.push({
         name: r[i+1],
@@ -197,8 +200,9 @@ function compile(a) {
       skip += skipp;
       break;
       case 'Custom_Ability':
+      chk.var = true;
       if(inn.length > 0) throw new Error('You must create custom abilities outside anything.');
-      if(chk) throw new Error('Create custom abilities before doing something else.');
+      if(chk.abi) throw new Error('Create custom abilities before doing something else.');
       if(r[i+1] in stuff.customabilities) throw new Error('You cannot re-create a custom ability.');
       json.abilities.push({
         blocks: [],
