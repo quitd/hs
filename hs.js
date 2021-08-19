@@ -88,7 +88,6 @@ object({
 block({
   name: 'broadcast_message',
   args: ['any'],
-  //TODO: variable thing later
   func: (arg) => {
     return {
       "block_class": "method",
@@ -277,6 +276,54 @@ block({
         {
           "value": args[1],
           "key": "color",
+          "type": 44
+        }
+      ]
+    }
+  }
+})
+
+bl2({
+  name: 'draw_a_trail',
+  args: ['color', 'any'],
+  func: (args, id) => {
+    return {
+      "type": 26,
+      "block_class": "control",
+      "description": "Draw a Trail",
+      "controlScript": {
+        "abilityID": id
+      },
+      "parameters": [
+        {
+          "value": args[0],
+          "key": "color",
+          "type": 44
+        },
+        {
+          "value": args[1],
+          "defaultValue": "",
+          "key": "width",
+          "type": 57,
+          datum: args[1]
+        }
+      ]
+    }
+  }
+});
+
+block({
+  name: 'set_trail_color',
+  args: ['color'],
+  func: args => {
+    return {
+      "block_class": "method",
+      "description": "Set Trail Color",
+      "type": 32,
+      "parameters": [
+        {
+          "value": args[0],
+          "key": "to",
           "type": 44
         }
       ]
