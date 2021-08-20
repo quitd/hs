@@ -175,9 +175,9 @@ function compile(a) {
       skip += skipp;
       break;
       case 'Var':
-      if(inn.length > 0) throw new Error('You must declare variables outside anything.');
-      if(chk.var) throw new Error('Declare variables before doing something else.');
-      if(r[i+1] in stuff.variables) throw new Error('You cannot redeclare a variable.');
+      if(inn.length > 0) throw new Error('You must create variables outside anything.');
+      if(chk.var) throw new Error('Create variables before doing something else.');
+      if(r[i+1] in stuff.variables) throw new Error('You cannot re-create a variable.');
       json.variables.push({
         name: r[i+1],
         type: 8003,
@@ -275,6 +275,9 @@ function handleStuff(a, b, c) {
     }
   } else if(a[b] == 'Obj') {
     if(c !== 'object') throw new Error('??');
+    inn.push({
+      type: 'obj'
+    })
     return {
       res: stuff.objs[a[b+1]].ep,
       add: 3
@@ -301,12 +304,51 @@ function handleStuff(a, b, c) {
 }
 
 compile(`
-  Scene hi
-  Object monkey Monkey1 100 200
+  Var testvar
+  Var test2
+  Custom_Ability ability
+  Block change_y Number 300 End
   End
-  Object monkey Monkey2 300 200
+  Custom_Ability changetext
+  Block set_text Variable testvar End Color 50 60 90 End
+  End
+  Scene scene
+  Object monkey Monkey 200 100
+  Rule when_game_starts
+  Block set_variable Variable testvar End Number 15 End
+  Block wait_seconds Number 1 End
+  Block broadcast_message Variable testvar End
+  End
+  Rule when_i_get_message Number 15 End
+  Block move_forward Number 300 End
+  End
+  End
+  Object monkey Monkey2 300 50
+  Rule when_game_starts
+  Block set_variable Variable test2 End Number -50 End
+  Block2 repeat_forever
+  Block change_x Number 50 End
+  Block wait_seconds Number 1 End
+  Block change_y Number 50 End
+  Block wait_seconds Number 1 End
+  Block change_x Number -50 End
+  Block wait_seconds Number 1 End
+  Block change_y Variable test2 End
+  Block wait_seconds Number 1 End
+  End
+  End
+  End
+  Object monkey Monkey3 600 40
+  Rule when_game_starts
+  Block wait_seconds Number 3 End
+  Ability ability
+  Block wait_seconds Number 1.5 End
+  Ability changetext
+  End
+  End
+  Object monkey Monkey4 20 100
   Rule when_object_is_tapped Obj Monkey2 End
-  Block move_forward Number 100 End
+  Block grow Variable testvar End
   End
   End
   End
