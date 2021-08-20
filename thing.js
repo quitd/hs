@@ -4,7 +4,8 @@ var stuff = {
   blocks: {},
   variables: {},
   bl2s: {},
-  customabilities: {}
+  customabilities: {},
+  objs: {}
 }
 
 var json = {
@@ -104,6 +105,13 @@ function compile(a) {
         width: 100,
         height: 100
       });
+      var ep = pleaseGiveMeSomeRandom();
+      json.eventParameters.push({
+        id: ep,
+        objectID: id,
+        description: 'Object',
+        blockType: 8000
+      });
       objnames.push(r[i+2]);
       json.scenes[inn[inn.length-1].index].objects.push(id);
       skip += 4;
@@ -111,6 +119,10 @@ function compile(a) {
         index: json.objects.length-1,
         type: 'object'
       });
+      stuff.objs[r[i+2]] = {
+        index: json.objects.length - 1,
+        ep
+      };
       break;
       case 'Rule':
       if((inn[inn.length-1]||{type: 'aa'}).type !== 'object') throw new Error('You must add rules in an object.');
@@ -261,6 +273,12 @@ function handleStuff(a, b, c) {
       res: `HSB(${hsb.join(',')})`,
       add: 5
     }
+  } else if(a[b] == 'Obj') {
+    if(c !== 'object') throw new Error('??');
+    return {
+      res: stuff.objs[a[b+1]].ep,
+      add: 3
+    }
   } else {
     if(['variable', 'color'].includes(c)) throw new Error('??')
     inn.push({
@@ -283,46 +301,13 @@ function handleStuff(a, b, c) {
 }
 
 compile(`
-  Var testvar
-  Var test2
-  Custom_Ability ability
-  Block change_y Number 300 End
+  Scene hi
+  Object monkey Monkey1 100 200
   End
-  Custom_Ability changetext
-  Block set_text Variable testvar End Color 50 60 90 End
+  Object monkey Monkey2 300 200
+  Rule when_object_is_tapped Obj Monkey2 End
+  Block move_forward Number 100 End
   End
-  Scene scene
-  Object monkey Monkey 200 100
-  Rule when_game_starts
-  Block set_variable Variable testvar End Number 15 End
-  Block wait_seconds Number 1 End
-  Block broadcast_message Variable testvar End
-  End
-  Rule when_i_get_message Number 15 End
-  Block move_forward Number 300 End
-  End
-  End
-  Object monkey Monkey2 300 50
-  Rule when_game_starts
-  Block set_variable Variable test2 End Number -50 End
-  Block2 repeat_forever
-  Block change_x Number 50 End
-  Block wait_seconds Number 1 End
-  Block change_y Number 50 End
-  Block wait_seconds Number 1 End
-  Block change_x Number -50 End
-  Block wait_seconds Number 1 End
-  Block change_y Variable test2 End
-  Block wait_seconds Number 1 End
-  End
-  End
-  End
-  Object monkey Monkey3 600 40
-  Rule when_game_starts
-  Block wait_seconds Number 3 End
-  Ability ability
-  Block wait_seconds Number 1.5 End
-  Ability changetext
   End
   End
   `)

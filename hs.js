@@ -46,14 +46,10 @@ rule({
   }
 })
 
-rule({ //TODO: fix this
+rule({
   name: 'when_object_is_tapped',
   args: ['object'],
   parameters: arg => {
-    var h;
-    json.objects.forEach(v => {
-      if(v.name === arg[0]) h = v.objectID;
-    });
     return [
       {
         "datum": {
@@ -66,7 +62,7 @@ rule({ //TODO: fix this
               "value": "",
               "key": "",
               "type": 50,
-              "variable": h||null
+              "variable": arg[0]
             }
           ]
         },
@@ -325,6 +321,48 @@ block({
           "value": args[0],
           "key": "to",
           "type": 44
+        }
+      ]
+    }
+  }
+})
+
+block({
+  name: 'grow',
+  args: ['any'],
+  func: args => {
+    return {
+      "block_class": "method",
+      "description": "Grow by",
+      "type": 48,
+      "parameters": [
+        {
+          "value": args[0],
+          "defaultValue": "",
+          "key": "percent",
+          "type": 57,
+          datum: args[0]
+        }
+      ]
+    }
+  }
+})
+
+block({
+  name: 'turn',
+  args: ['any'],
+  func: arg => {
+    return {
+      "block_class": "method",
+      "type": 24,
+      "description": "Turn",
+      "parameters": [
+        {
+          "value": arg[0],
+          "defaultValue": "",
+          "key": "degrees",
+          "type": 57,
+          datum: arg[0]
         }
       ]
     }
