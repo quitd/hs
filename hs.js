@@ -368,3 +368,49 @@ block({
     }
   }
 })
+
+object({
+  name: 'square',
+  type: 101,
+  filename: 'fullSizeSquare.png'
+})
+
+block({
+  args: ['color'],
+  name: 'set_color',
+  func: args => {
+    return {
+      "block_class": "method",
+      "type": 54,
+      "description": "Set Color",
+      "parameters": [
+        {
+          "value": args[0],
+          "defaultValue": "",
+          "key": "",
+          "type": 44
+        }
+      ]
+    }
+  }
+})
+
+rule({
+  name: 'when_game_is_playing',
+  args: [],
+  parameters: () => {
+    return [
+      {
+        "datum": {
+          "type": 7021,
+          "block_class": "operator",
+          "description": "Game Starts"
+        },
+        "key": "",
+        "value": "",
+        "defaultValue": "",
+        "type": 52
+      }
+    ]
+  }
+})

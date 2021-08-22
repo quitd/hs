@@ -346,9 +346,12 @@ compile(`
   Ability changetext
   End
   End
-  Object monkey Monkey4 20 100
+  Object square Square 20 100
   Rule when_object_is_tapped Obj Monkey2 End
   Block grow Variable testvar End
+  End
+  Rule when_game_is_playing
+  Block set_color Color 80 400 222 End
   End
   End
   End
