@@ -1,3 +1,7 @@
+/* eslint-disable no-unused-vars */
+
+const fs = require('fs');
+
 var stuff = {
   rules: {},
   objects: {},
@@ -62,7 +66,7 @@ function bl2(arg) {
 }
 
 //blocks and stuff
-eval(Deno.readTextFileSync('hs.js'));
+eval(fs.readFileSync('hs.js', 'utf8'));
 
 function compile(a) {
   var chk = {
@@ -71,6 +75,7 @@ function compile(a) {
   };
   json.uuid = new Date().getTime().toString(32)
   a.trim().replace(/\n/g, ' ').split(' ').forEach((v, i, r) => {
+    var id, skipp, num, args;
     if(skip > 0) {
       skip -= 1;
       return;
@@ -92,7 +97,7 @@ function compile(a) {
       case 'Object':
       if((inn[inn.length-1]||{type: 'aa'}).type !== 'scene') throw new Error('You must add objects in a scene.');
       if(objnames.includes(r[i+2])) throw new Error('Cannot have 2 objects with the same name!')
-      var id = pleaseGiveMeSomeRandom()
+      id = pleaseGiveMeSomeRandom()
       json.objects.push({
         resizeScale: 1,
         type: stuff.objects[r[i+1]].type,
@@ -126,10 +131,10 @@ function compile(a) {
       break;
       case 'Rule':
       if((inn[inn.length-1]||{type: 'aa'}).type !== 'object') throw new Error('You must add rules in an object.');
-      var id = pleaseGiveMeSomeRandom();
-      var skipp = 1;
-      var args = [];
-      var num = 2;
+      id = pleaseGiveMeSomeRandom();
+      skipp = 1;
+      args = [];
+      num = 2;
       stuff.rules[r[i+1]].args.forEach(v => {
         var thing = handleStuff(r, i+num, v)
         args.push(thing.res);
@@ -161,9 +166,9 @@ function compile(a) {
       skip += skipp;
       break;
       case 'Block':
-      var skipp = 1;
-      var num = 2;
-      var args = [];
+      skipp = 1;
+      num = 2;
+      args = [];
       stuff.blocks[r[i+1]].args.forEach(v => {
         var thing = handleStuff(r, i+num, v)
         args.push(thing.res);
@@ -187,9 +192,9 @@ function compile(a) {
       skip += 1;
       break;
       case 'Block2':
-      var skipp = 1;
-      var num = 2;
-      var args = [];
+      skipp = 1;
+      num = 2;
+      args = [];
       stuff.bl2s[r[i+1]].args.forEach(v => {
         var thing = handleStuff(r, i+num, v)
         args.push(thing.res);
@@ -197,7 +202,7 @@ function compile(a) {
         skipp+=thing.add;
         inn.splice(-1);
       });
-      var id = pleaseGiveMeSomeRandom();
+      id = pleaseGiveMeSomeRandom();
       json.abilities[inn[inn.length - 1].abilindex].blocks.push(stuff.bl2s[r[i+1]].func(args, id));
       json.abilities.push({
         abilityID: id,
@@ -289,7 +294,7 @@ function handleStuff(a, b, c) {
     });
     var d = [];
     var e = 1;
-    for(var x=0;x==x;e++) {
+    for(var y=0;y==y;e++) {
       if(a[b+e] == 'End') {
         break;
       } else {

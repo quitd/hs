@@ -1,0 +1,11 @@
+{
+  "name": "hs",
+  "version": "0.0.0",
+  "main": "thing.js",
+  "repository": "https://github.com/quitd/hs",
+  "author": "quitd",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^7.32.0"
+  }
+}

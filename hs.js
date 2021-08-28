@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 rule({
   name: 'when_game_starts',
   args: [],
@@ -16,6 +18,18 @@ rule({
     ]
   }
 });
+
+block({
+  name: 'create_a_clone_of_this_object',
+  args: [],
+  func: () => {
+    return {
+      "type": 53,
+      "block_class": "method",
+      "description": "Create a Clone of This Object"
+    }
+  }
+})
 
 rule({
   name: 'when_i_get_message',
@@ -199,7 +213,7 @@ block({
 bl2({
   name: 'repeat_forever',
   args: [],
-  func: (ar, id) => {
+  func: (_ar, id) => {
     return {
       "block_class": "control",
       "description": "Repeat Forever",
